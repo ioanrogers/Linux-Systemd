@@ -24,8 +24,8 @@ XSLoader::load;
 # use constant LOG_DEBUG   => 7;
 
 has app_id => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub {
         require File::Basename;
         return File::Basename::basename($0);
@@ -37,6 +37,7 @@ has app_id => (
 Default log priority
 
 =cut
+
 has priority => (is => 'ro', lazy => 1, default => 6);
 
 =method C<print($msg, $pri)>
@@ -44,6 +45,7 @@ has priority => (is => 'ro', lazy => 1, default => 6);
 $msg should be either a string. $pri is optional, and defaults to $self->priority
 
 =cut
+
 sub print {
     my ($self, $msg, $pri) = @_;
     $pri = $self->priority if !$pri;
@@ -65,7 +67,7 @@ sub send {
     if (scalar @_ == 2 && !ref $_[0]) {
         my $ref = ref $_[1];
         if ($ref eq 'HASH') {
-            $data = { %{$_[1]} };
+            $data = {%{$_[1]}};
         } elsif ($ref eq 'ARRAY') {
             $data = {@{$_[1]}};
         }
@@ -87,7 +89,7 @@ sub send {
 
     # message is required
     if (!exists $data->{message} && !exists $data->{MESSAGE}) {
-       croak 'Missing message param';
+        croak 'Missing message param';
     }
 
     # XXX this isn't required by sd-journal
@@ -122,8 +124,9 @@ sub send {
 Logs the string of the current set C<errno>, prefixed with C<$msg>.
 
 =cut
+
 sub perror {
-   __sd_journal_perror($_[1]);
+    __sd_journal_perror($_[1]);
     return 1;
 }
 
