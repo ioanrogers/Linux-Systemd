@@ -5,8 +5,7 @@ package Linux::Systemd::Journal::Write;
 # TODO Helper script to generate message catalogs?
 # http://www.freedesktop.org/wiki/Software/systemd/catalog/
 
-# TODO pass the CODE_* values to systemd so it doesn't mark everything
-# as coming from Write.xs
+# TODO make sure all text is utf8
 
 use v5.10.1;
 use Moo;
@@ -15,33 +14,41 @@ use XSLoader;
 use Data::Printer;
 XSLoader::load;
 
-has app_id => (is => 'ro', lazy => 1);
+# use constant LOG_EMERG   => 0;
+# use constant LOG_ALERT   => 1;
+# use constant LOG_CRIT    => 2;
+# use constant LOG_ERR     => 3;
+# use constant LOG_WARNING => 4;
+# use constant LOG_NOTICE  => 5;
+# use constant LOG_INFO    => 6;
+# use constant LOG_DEBUG   => 7;
+
+has app_id => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        require File::Basename;
+        return File::Basename::basename($0);
+    },
+);
+
+=attr C<priority>
+
+Default log priority
+
+=cut
 has priority => (is => 'ro', lazy => 1, default => 6);
 
 =method C<print($msg, $pri)>
 
-$msg should be either a string or an arrayref suitable for use with L<sprintf>
-$pri is optional, and defaults to $self->priority
+$msg should be either a string. $pri is optional, and defaults to $self->priority
 
 =cut
 sub print {
-    if (scalar @_ > 3) {
-        confess 'Too many args. Did you forget to use an arrayref?';
-    }
-
     my ($self, $msg, $pri) = @_;
-
-    # TODO I'd prefer to not use an arrayref
-    if (ref $msg eq 'ARRAY') {
-        $msg = sprintf shift $msg, @$msg;
-    }
-
-    say "Trying to send [$msg]";
     $pri = $self->priority if !$pri;
-    my $ret = _my_sd_journal_print($pri, $msg);
-    confess "Error sending message: $!" if $ret;
-
-    return;
+    __sd_journal_print($pri, $msg);
+    return 1;
 }
 
 =method C<send($data)>
@@ -51,13 +58,36 @@ $data must be a hashref. Keys will be uppercased.
 =cut
 
 sub send {
-    my ($self, $data) = @_;
-    # TODO send($msg, $data);
-    # TODO $data can also be an arrayref or an array (and maybe a string?)
+    my $self = shift;
+
+    my $data;
+
+    if (scalar @_ == 2 && !ref $_[0]) {
+        my $ref = ref $_[1];
+        if ($ref eq 'HASH') {
+            $data = { %{$_[1]} };
+        } elsif ($ref eq 'ARRAY') {
+            $data = {@{$_[1]}};
+        }
+        $data->{message} = $_[0];
+    } elsif (scalar @_ > 1) {
+        $data = {@_};
+    } else {
+        my $ref = ref $_[0];
+        if (!$ref) {
+            $data->{message} = shift;
+        } elsif ($ref eq 'HASH') {
+            $data = shift;
+        } elsif ($ref eq 'ARRAY') {
+            $data = {@{$_[0]}};
+        }
+    }
+
+    croak 'Invalid params' unless defined $data;
 
     # message is required
     if (!exists $data->{message} && !exists $data->{MESSAGE}) {
-        confess "Missing message param";
+       croak 'Missing message param';
     }
 
     # XXX this isn't required by sd-journal
@@ -65,14 +95,36 @@ sub send {
         $data->{priority} = $self->priority;
     }
 
-    # flatten it out
-    my @array = map { uc($_) . '=' . $data->{$_} } keys $data;
-
-    if (_my_sd_journal_send(\@array) != 0) {
-        confess "Error sending message: $!";
+    if (!exists $data->{priority} && !exists $data->{PRIORITY}) {
+        $data->{priority} = $self->priority;
     }
 
-    return;
+    if (!exists $data->{syslog_identifier}) {
+        $data->{syslog_identifier} = $self->app_id;
+    }
+
+    my ($pkg, $file, $line, $sub) = caller(0);
+
+    $data->{CODE_FUNC} = $sub;
+    $data->{CODE_LINE} = $line;
+    $data->{CODE_FILE} = $file;
+
+    # flatten it out
+    my @array = map { uc($_) . '=' . ($data->{$_} // 'undef') } keys $data;
+
+    __sd_journal_send(\@array);
+
+    return 1;
+}
+
+=method C<perror($msg)>
+
+Logs the string of the current set C<errno>, prefixed with C<$msg>.
+
+=cut
+sub perror {
+   __sd_journal_perror($_[1]);
+    return 1;
 }
 
 1;
