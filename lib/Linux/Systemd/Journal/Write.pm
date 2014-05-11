@@ -16,7 +16,7 @@ XSLoader::load;
 
 =attr C<app_id>
 
-Will be used to set C<SYSLOG_IDENTIFIER>. Defaults to basename($0);
+Will be used to set C<SYSLOG_IDENTIFIER>. Defaults to C<basename($0)>;
 
 =cut
 
@@ -31,13 +31,13 @@ has app_id => (
 
 =attr C<priority>
 
-Default log priority
+Default log priority. See L</"Log Levels">
 
 =cut
 
 has priority => (is => 'ro', lazy => 1, default => 6);
 
-=method C<print($msg, $pri)>
+=method C<print($msg, $pri?)>
 
 $msg should be either a string. $pri is optional, and defaults to $self->priority
 
@@ -157,3 +157,24 @@ sub perror {
   open my $fh, '<', 'nosuchfile'
     or $jnl->perror('Failed to open file');
 
+=head1 DESCRIPTION
+
+=head2 Log Levels
+
+The log levels use by C<journald> and by L</priority> are the same as those
+use by C<syslog>, so instead of using numeric priorities you can
+
+  use Sys::Syslog ':macros';
+
+giving you access to the C<LOG_*> L<"level constants"|Sys::Syslog/Levels>
+
+=head1 SEE ALSO
+
+=for :list
+* L<Log::Journald>
+At some point between me writing this module and getting around to releasing it,
+another module was released to write the journal.
+* L<systemd|http://www.freedesktop.org/wiki/Software/systemd/>
+The main C<systemd> page.
+* L<sd-journal(3)>
+Man page of the C API
