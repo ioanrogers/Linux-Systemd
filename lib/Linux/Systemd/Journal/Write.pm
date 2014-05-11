@@ -131,3 +131,22 @@ sub perror {
 }
 
 1;
+
+=HEAD1 SYNOPSIS
+
+  use Linux::Systemd::Journal::Write;
+
+  my $jnl = Linux::Systemd::Journal::Write->new;
+
+  # basic log messages
+  $jnl->print('flarg');          # with default log level
+  $jnl->print('Hello world', 4); # WARN level
+
+  # add abitrary data to the log entry
+  my %hash = (DAY_ONE => 'Monday', DAY_TWO => 'Tuesday', DAY_THREE => 'Wednesday');
+  $jnl->send('Here is a message', \%hash); # add abitrary data to the log entry
+
+  # will log "Failed to open file: No such file or directory" and ERRNO=2
+  open my $fh, '<', 'nosuchfile'
+    or $jnl->perror('Failed to open file');
+
