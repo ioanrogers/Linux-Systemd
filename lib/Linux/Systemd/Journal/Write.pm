@@ -112,11 +112,11 @@ sub send {
         $data->{syslog_identifier} = $self->app_id;
     }
 
-    my ($pkg, $file, $line, $sub) = caller(0);
+    my @caller = caller(0);
 
-    # $data->{CODE_FUNC} = $sub;
-    $data->{CODE_LINE} = $line;
-    $data->{CODE_FILE} = $file;
+    # $data->{CODE_FUNC} = $caller[3];
+    $data->{CODE_LINE} = $caller[2];
+    $data->{CODE_FILE} = $caller[1];
 
     # flatten it out
     my @array = map { uc($_) . '=' . ($data->{$_} // 'undef') } keys $data;
