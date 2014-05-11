@@ -107,7 +107,7 @@ sub send {
 
     my ($pkg, $file, $line, $sub) = caller(0);
 
-    $data->{CODE_FUNC} = $sub;
+    # $data->{CODE_FUNC} = $sub;
     $data->{CODE_LINE} = $line;
     $data->{CODE_FILE} = $file;
 
