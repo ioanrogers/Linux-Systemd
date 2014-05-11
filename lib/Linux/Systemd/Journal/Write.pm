@@ -104,10 +104,6 @@ sub send {
         $data->{priority} = $self->priority;
     }
 
-    if (!exists $data->{priority} && !exists $data->{PRIORITY}) {
-        $data->{priority} = $self->priority;
-    }
-
     if (!exists $data->{syslog_identifier}) {
         $data->{syslog_identifier} = $self->app_id;
     }
