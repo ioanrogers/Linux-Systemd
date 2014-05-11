@@ -35,7 +35,14 @@ Default log priority. See L</"Log Levels">
 
 =cut
 
-has priority => (is => 'ro', lazy => 1, default => 6);
+has priority => (
+    is      => 'ro',
+    lazy    => 1,
+    default => 6,
+    isa     => sub {
+        die 'Invalid log level' unless (defined $_[0] && $_[0] =~ /^[0-7]$/);
+    },
+);
 
 =method C<print($msg, $pri?)>
 
