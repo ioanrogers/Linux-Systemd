@@ -139,7 +139,7 @@ sub perror {
 
 1;
 
-=HEAD1 SYNOPSIS
+=head1 SYNOPSIS
 
   use Linux::Systemd::Journal::Write;
 
