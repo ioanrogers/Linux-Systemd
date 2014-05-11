@@ -28,6 +28,7 @@ sub new {
     if (defined $pkg_info{cflags}) {
         $args{extra_compiler_flags} = $pkg_info{cflags};
     }
+    $args{extra_compiler_flags} .= ' -std=c99';
     $args{extra_linker_flags} = $pkg_info{libs};
 
     my $builder = Module::Build->new(%args);
