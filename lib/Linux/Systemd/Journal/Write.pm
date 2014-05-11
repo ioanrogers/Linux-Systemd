@@ -14,14 +14,11 @@ use XSLoader;
 use Data::Printer;
 XSLoader::load;
 
-# use constant LOG_EMERG   => 0;
-# use constant LOG_ALERT   => 1;
-# use constant LOG_CRIT    => 2;
-# use constant LOG_ERR     => 3;
-# use constant LOG_WARNING => 4;
-# use constant LOG_NOTICE  => 5;
-# use constant LOG_INFO    => 6;
-# use constant LOG_DEBUG   => 7;
+=attr C<app_id>
+
+Will be used to set C<SYSLOG_IDENTIFIER>. Defaults to basename($0);
+
+=cut
 
 has app_id => (
     is      => 'ro',
@@ -53,9 +50,19 @@ sub print {
     return 1;
 }
 
-=method C<send($data)>
+=method C<send($msg_or_data, $data?)>
 
-$data must be a hashref. Keys will be uppercased.
+If there is one arg, it may be a simple string to log. Or, it could be a hashref
+ or an arrayref. In this case, one of the keys sent MUST be 'message'.
+
+If there are two args, the first must be the string to use as a message, the
+second a hashref or arrayref. In this case, a key called message should not be
+set.
+
+Finally, C<send> can also be called with an array of key => values, one of which
+must be message.
+
+Keys will be uppercased.
 
 =cut
 
