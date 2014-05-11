@@ -11,7 +11,6 @@ use v5.10.1;
 use Moo;
 use Carp;
 use XSLoader;
-use Data::Printer;
 XSLoader::load;
 
 =attr C<app_id>
