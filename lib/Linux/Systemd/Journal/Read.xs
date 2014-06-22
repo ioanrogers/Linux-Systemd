@@ -4,6 +4,8 @@
 
 #include <systemd/sd-journal.h>
 
+sd_journal *j;
+
 void split_data_to_svs(const char *msg, SV **k_sv, SV **v_sv) {
     char *data_copy = strdup(msg);
     char *k = strtok(data_copy, "=");
@@ -18,14 +20,12 @@ MODULE = Linux::Systemd::Journal::Read PACKAGE = Linux::Systemd::Journal::Read
 
 PROTOTYPES: DISABLE
 
-sd_journal *
+NO_OUTPUT void
 __open()
     CODE:
-        int r = sd_journal_open( &RETVAL, SD_JOURNAL_LOCAL_ONLY);
+        int r = sd_journal_open( &j, SD_JOURNAL_LOCAL_ONLY);
         if (r < 0)
             croak("Failed to open journal: %s\n", strerror(r));
-    OUTPUT:
-        RETVAL
 
 void
 __close(sd_journal *j)
@@ -33,42 +33,52 @@ __close(sd_journal *j)
         sd_journal_close(j);
 
 uint64_t
-__get_usage(sd_journal *j)
+get_usage(self)
     CODE:
         int r = sd_journal_get_usage(j, &RETVAL);
         if (r < 0)
-            croak("Failed to open journal: %s\n", strerror(-r));
+            croak("Failed to get journal usage: %s\n", strerror(-r));
     OUTPUT:
         RETVAL
 
-NO_OUTPUT void
-__next(sd_journal *j)
+int
+next(self)
     CODE:
+        RETVAL = 1;
         int r = sd_journal_next(j);
         if (r < 0)
             croak("Failed to move to next record: %s\n", strerror(-r));
 
+        if (r == 0)
+            RETVAL = 0;
+
+    OUTPUT:
+        RETVAL
+
 NO_OUTPUT void
-__seek_head(sd_journal *j)
+seek_head(self)
     CODE:
         int r = sd_journal_seek_head(j);
         if (r < 0)
             croak("Failed to seek to journal head: %s\n", strerror(-r));
 
 NO_OUTPUT void
-__seek_tail(sd_journal *j)
+seek_tail(self)
     CODE:
         int r = sd_journal_seek_tail(j);
         if (r < 0)
             croak("Failed to seek to journal tail: %s\n", strerror(-r));
 
 SV *
-__get_data(sd_journal *j, const char *field)
-    CODE:
-        SV     *key_sv;
+get_data(self, const char *field)
+    PREINIT:
         char   *data;
+        int    r;
         size_t l;
-        int r = sd_journal_get_data(j, field, (const void**) &data, &l);
+        SV     *key_sv;
+
+    CODE:
+        r = sd_journal_get_data(j, field, (const void**) &data, &l);
         if (r < 0)
             croak("Failed to read message field '%s': %s\n", field, strerror(-r));
 
@@ -77,7 +87,7 @@ __get_data(sd_journal *j, const char *field)
         RETVAL
 
 HV *
-__get_entry(sd_journal *j)
+get_entry(self)
     CODE:
         const void *data;
         size_t l;
