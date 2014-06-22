@@ -121,7 +121,7 @@ sub send {
     $data->{CODE_FILE} = $caller[1];
 
     # flatten it out
-    my @array = map { uc($_) . '=' . ($data->{$_} // 'undef') } keys $data;
+    my @array = map { uc($_) . '=' . ($data->{$_} // 'undef') } keys %$data;
 
     __sd_journal_send(\@array);
 
