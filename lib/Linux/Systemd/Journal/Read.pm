@@ -45,4 +45,23 @@ Returns a hashref of all the fields in the current entry.
 
 This method is not a direct wrap of the journal API.
 
+=method C<get_next_entry>
+
+Moves the cursor to the next record and returns it.
+
+This method is not a direct wrap of the journal API.
+
+=cut
+
+# TODO find out how to call other XS subs from XS and move this into Read.xs
+sub get_next_entry {
+    my $self = shift;
+
+    if ($self->next) {
+        return $self->get_entry;
+    }
+
+    return;
+}
+
 1;

@@ -20,3 +20,10 @@ say '_EXE: ' . $jnl->get_data('_EXE');
 $jnl->next;
 my $entry = $jnl->get_entry;
 p $entry;
+
+my $i = 0;
+while (my $entry = $jnl->get_next_entry) {
+    p $entry;
+    $i++;
+    last if $i == 25;    # limit for the example
+}
