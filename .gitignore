@@ -1,4 +1,6 @@
 Linux-*
 .build
 *~
+*.c
+*.o
 
