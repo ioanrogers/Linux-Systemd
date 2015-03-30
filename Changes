@@ -1,10 +1,10 @@
 Changelog for Linux-Systemd-Journal
 
-0.002 2015-03-30T03:50:49
+0.002 2015-03-30T03:50:49Z
  - Initial journal read support
  - Added a Linux::Systemd::Journal placeholder to get the namespace. The
    previous release was never actually indexed.
-      
+
 0.001 2014-05-11T20:56:13Z
  - First release
 
