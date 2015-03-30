@@ -8,6 +8,15 @@ use Linux::Systemd::Journal::Read;
 
 my $jnl = Linux::Systemd::Journal::Read->new;
 
+sub dump_messages {
+    my $i = 0;
+    while (my $entry = $jnl->get_entry) {
+        p $entry;
+        $i++;
+        $jnl->next;
+        last if $i == 5;    # limit for the example
+    }
+}
 my $bytes = $jnl->get_usage;
 say "Journal size: $bytes bytes";
 
@@ -17,13 +26,20 @@ $jnl->next;
 say 'MESSAGE: ' . $jnl->get_data('MESSAGE');
 say '_EXE: ' . $jnl->get_data('_EXE');
 
-$jnl->next;
-my $entry = $jnl->get_entry;
-p $entry;
+## try filtering on priority
+$jnl->match(priority => 2);
+say "Showing on priority=2";
+dump_messages;
+$jnl->flush_matches;
 
-my $i = 0;
-while (my $entry = $jnl->get_next_entry) {
-    p $entry;
-    $i++;
-    last if $i == 25;    # limit for the example
-}
+$jnl->match(_systemd_unit => 'gdm.service');
+say "Showing gdm.service";
+dump_messages;
+$jnl->flush_matches;
+
+say 'x' x 24;
+$jnl->match(priority => 6, _systemd_unit => 'packagekit.service');
+$jnl->match_or(priority => 7);
+
+# $jnl->match_or(_pid => 25811);
+dump_messages;
