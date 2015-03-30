@@ -3,4 +3,5 @@ Linux-*
 *~
 *.c
 *.o
-
+blib
+_build
