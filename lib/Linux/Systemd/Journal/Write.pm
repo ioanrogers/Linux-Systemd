@@ -51,7 +51,7 @@ $msg should be either a string. $pri is optional, and defaults to $self->priorit
 
 sub print {
     my ($self, $msg, $pri) = @_;
-    $pri = $self->priority if !$pri;
+    $pri //= $self->priority;
     __sd_journal_print($pri, $msg);
     return 1;
 }
