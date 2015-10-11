@@ -1,5 +1,7 @@
 package Linux::Systemd::Journal;
 
+use strict;
+
 # ABSTRACT: Use the systemd journal
 
 1;
