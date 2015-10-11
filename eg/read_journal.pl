@@ -3,18 +3,18 @@
 use v5.10.1;
 use strict;
 use warnings;
-use Data::Printer;
 use Linux::Systemd::Journal::Read;
 
 my $jnl = Linux::Systemd::Journal::Read->new;
 
 sub dump_messages {
     my $i = 0;
-    while (my $entry = $jnl->get_entry) {
-        p $entry;
-        $i++;
-        $jnl->next;
-        last if $i == 5;    # limit for the example
+    while (my $entry = $jnl->get_next_entry) {
+        for my $key (sort keys %$entry) {
+            say "$key: " . $entry->{$key};
+        }
+        say '-' x 40;
+        last if $i++ == 5;    # limit for the example
     }
 }
 my $bytes = $jnl->get_usage;

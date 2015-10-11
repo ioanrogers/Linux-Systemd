@@ -10,10 +10,6 @@ use Carp;
 use XSLoader;
 XSLoader::load;
 
-sub DEMOLISH {
-    __close();
-}
-
 sub BUILD {
     return __open();
 }
@@ -26,37 +22,13 @@ Returns the number of bytes used by the open journal
 
 Seeks to the start of the open journal.
 
-=cut
-
-sub seek_head {
-    my $self = shift;
-    __seek_head();
-    return 1;
-}
-
-=method C<seek_head>
+=method C<seek_tail>
 
 Seeks to the end of the open journal.
-
-=cut
-
-sub seek_tail {
-    my $self = shift;
-    __seek_tail($self->_j);
-    return 1;
-}
 
 =method C<next>
 
 Moves to the next record.
-
-=cut
-
-sub next {
-    my $self = shift;
-    __next();
-    return 1;
-}
 
 =method C<get_data($field)>
 
@@ -64,20 +36,11 @@ Returns the value of C<$field> from the current record.
 
 See L<systemd.journal-fields(7)> for a list of well-known fields.
 
-=cut
-
-sub get_data {
-    my ($self, $field) = @_;
-    return __get_data($field);
-}
-
 =method C<get_entry>
 
 Returns a hashref of all the fields in the current entry.
 
 This method is not a direct wrap of the journal API.
-
-=cut
 
 =method C<get_next_entry>
 
@@ -90,10 +53,9 @@ This method is not a direct wrap of the journal API.
 sub get_next_entry {
     my $self = shift;
 
-    if ($self->next) {
+    if ($self->next > 0) {
         return $self->get_entry;
     }
-
     return;
 }
 
@@ -132,11 +94,8 @@ sub _match {
 
     croak 'Invalid params' unless @matches;
 
-    use Data::Printer;
-
     # $key = uc $key;
     foreach my $pair (@matches) {
-        p $pair;
         __add_match(uc($pair->[0]) . "=" . $pair->[1]);
     }
 }
