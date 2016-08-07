@@ -28,7 +28,7 @@ __sd_journal_perror(const char *msg)
 NO_OUTPUT int
 __sd_journal_send(AV *data)
     CODE:
-        int array_size = av_top_index(data) + 1;
+        int array_size = av_len(data) + 1;
         struct iovec iov[array_size];
 
         for (int i = 0; i < array_size; i++) {
