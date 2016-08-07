@@ -1,4 +1,4 @@
---backup-and-modify-in-place
+--backup-file-extension=~
 --maximum-line-length=79
 --indent-columns=4
 --continuation-indentation=2

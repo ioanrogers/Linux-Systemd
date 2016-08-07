@@ -1,22 +1,13 @@
 [PerlTidy]
-select = **/*.{pl,pm,t}
-argv = --profile=$ROOT/perltidyrc
+select = **/*.{pm,t}
+argv = --profile=$ROOT/.perltidyrc
+except_modes = test
 
 [Perl::AlignMooseAttributes]
-select = lib/**/*.pm 
-
-; The Pod plugins don't get on with Pod::Weaver
-[PodChecker]
-select = **/*.{pl,pm,pod}
-only_modes = test
-
-[PodTidy]
-select = **/*.{pl,pm,pod}
-only_modes = test
-
-; criticise *after* dzil and weaver are done
-[PerlCritic]
 select = lib/**/*.pm
-argv = --profile=$ROOT/perlcriticrc --stern
-only_modes = test
+except_modes = test
+
+[SortLines]
+select = .gitignore
+except_modes = test
 
