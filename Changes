@@ -1,5 +1,9 @@
 Changelog for Linux-Systemd-Journal
 
+0.004 2016-08-07T20:59:20Z
+ - [closes #2] replace call to av_top_index to av_len because it is
+   available on perls < 5.18 (Ioan Rogers)
+
 0.003 2015-10-11T03:51:42Z
  - [Closes #1] fix missing params to C calls
  - Add a previous method
