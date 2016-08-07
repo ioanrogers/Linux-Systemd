@@ -19,7 +19,8 @@ sub new {
         %pkg_info = ExtUtils::PkgConfig->find($pkg_name);
     }
     catch {
-        say "Do you need to install libsystemd-journal-dev (debian) or systemd-devel (fedora)?";
+        say
+          "Do you need to install libsystemd-journal-dev (debian) or systemd-devel (fedora)?";
         exit;
     };
 

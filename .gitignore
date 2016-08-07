@@ -1,7 +1,7 @@
-Linux-*
-.build
-*~
 *.c
 *.o
-blib
+*~
+.build
+Linux-*
 _build
+blib
