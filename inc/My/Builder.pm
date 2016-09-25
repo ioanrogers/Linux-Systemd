@@ -1,10 +1,9 @@
 package My::Builder;
 
-use v5.10.1;
+use v5.16;
 use strict;
 use warnings;
 use base 'Module::Build';
-use lib "inc";
 
 use Try::Tiny;
 use ExtUtils::PkgConfig;
@@ -12,7 +11,7 @@ use ExtUtils::PkgConfig;
 sub new {
     my ($class, %args) = @_;
 
-    my $pkg_name = 'libsystemd-journal';
+    my $pkg_name = 'libsystemd';
     my %pkg_info;
 
     try {
@@ -20,11 +19,11 @@ sub new {
     }
     catch {
         say
-          "Do you need to install libsystemd-journal-dev (debian) or systemd-devel (fedora)?";
+          'Do you need to install libsystemd-dev (debian) or systemd-devel (fedora)?';
         exit;
     };
 
-    say "Found libsystemd-journal-dev version: $pkg_info{modversion}";
+    say "Found libsystemd-dev version: $pkg_info{modversion}";
 
     if (defined $pkg_info{cflags}) {
         $args{extra_compiler_flags} = $pkg_info{cflags};
