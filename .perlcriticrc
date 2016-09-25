@@ -4,25 +4,23 @@ color = 1
 [ValuesAndExpressions::RequireNumberSeparators]
 min_value = 100000
 
-# not for git
-[-Miscellanea::RequireRcsKeywords]
-
 [InputOutput::RequireCheckedSyscalls]
 functions = :builtins
 exclude_functions = print say
 
-[Documentation::RequirePodSections]
-lib_sections    = NAME | SYNOPSIS | AUTHOR | VERSION | COPYRIGHT AND LICENSE
+# assembled by pod::weaver
+[-Documentation::RequirePodSections]
 
 # dzil puts begin block before strictures. Using moose anyway
 [-TestingAndDebugging::RequireUseStrict]
 
-# complains about the { __PACKAGE__::VERSION = blah } block dzil puts at the top
-[-TestingAndDebugging::RequireUseWarnings]
+# dzil
+[-Modules::RequireVersionVar]
 
-# allowing ifs because I prefer it for debug logging
-[ControlStructures::ProhibitPostfixControls]
-allow = if
+# complains about the { __PACKAGE__::VERSION = blah } block dzil puts at the top
+#[-TestingAndDebugging::RequireUseWarnings]
+
+[-ControlStructures::ProhibitPostfixControls]
 
 # handles elsewhere
 [-Documentation::PodSpelling]
@@ -32,3 +30,20 @@ allow = if
 
 # I prefer version strings and don't care about old perls
 [-ValuesAndExpressions::ProhibitVersionStrings]
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 12
+
+# doesn't know about Moo builders, etc
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+
+# don't care for these
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-RegularExpressions::RequireDotMatchAnything]
+[-Variables::ProhibitPunctuationVars]
+
+# this is useful with Moo(se)? for triggers, coercions, etc
+[-Subroutines::RequireArgUnpacking]
+
+# use experimental 'signatures' perl > 5.20
+[-Subroutines::ProhibitSubroutinePrototypes]
