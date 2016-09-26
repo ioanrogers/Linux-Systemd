@@ -1,5 +1,5 @@
 package Linux::Systemd::Journal::Write;
-
+$Linux::Systemd::Journal::Write::VERSION = '1.162700';
 # ABSTRACT: XS wrapper around sd-journal
 
 # TODO Helper script to generate message catalogs?
@@ -13,11 +13,6 @@ use Carp;
 use XSLoader;
 XSLoader::load;
 
-=attr C<app_id>
-
-Will be used to set C<SYSLOG_IDENTIFIER>. Defaults to C<basename($0)>;
-
-=cut
 
 has app_id => (
     is      => 'ro',
@@ -28,11 +23,6 @@ has app_id => (
     },
 );
 
-=attr C<priority>
-
-Default log priority. See L</"Log Levels">
-
-=cut
 
 has priority => (
     is      => 'ro',
@@ -43,11 +33,6 @@ has priority => (
     },
 );
 
-=method C<print($msg, $pri?)>
-
-$msg should be either a string. $pri is optional, and defaults to $self->priority
-
-=cut
 
 sub print {
     my ($self, $msg, $pri) = @_;
@@ -56,21 +41,6 @@ sub print {
     return 1;
 }
 
-=method C<send($msg_or_data, $data?)>
-
-If there is one arg, it may be a simple string to log. Or, it could be a hashref
- or an arrayref. In this case, one of the keys sent MUST be 'message'.
-
-If there are two args, the first must be the string to use as a message, the
-second a hashref or arrayref. In this case, a key called message should not be
-set.
-
-Finally, C<send> can also be called with an array of key => values, one of which
-must be message.
-
-Keys will be uppercased.
-
-=cut
 
 sub send {
     my $self = shift;
@@ -128,11 +98,6 @@ sub send {
     return 1;
 }
 
-=method C<perror($msg)>
-
-Logs the string of the current set C<errno>, prefixed with C<$msg>.
-
-=cut
 
 sub perror {
     __sd_journal_perror($_[1]);
@@ -140,6 +105,22 @@ sub perror {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=for :stopwords Ioan Rogers
+
+=head1 NAME
+
+Linux::Systemd::Journal::Write - XS wrapper around sd-journal
+
+=head1 VERSION
+
+version 1.162700
 
 =head1 SYNOPSIS
 
@@ -170,13 +151,116 @@ use by C<syslog>, so instead of using numeric priorities you can
 
 giving you access to the C<LOG_*> L<"level constants"|Sys::Syslog/Levels>
 
+=head1 ATTRIBUTES
+
+=head2 C<app_id>
+
+Will be used to set C<SYSLOG_IDENTIFIER>. Defaults to C<basename($0)>;
+
+=head2 C<priority>
+
+Default log priority. See L</"Log Levels">
+
+=head1 METHODS
+
+=head2 C<print($msg, $pri?)>
+
+$msg should be either a string. $pri is optional, and defaults to $self->priority
+
+=head2 C<send($msg_or_data, $data?)>
+
+If there is one arg, it may be a simple string to log. Or, it could be a hashref
+ or an arrayref. In this case, one of the keys sent MUST be 'message'.
+
+If there are two args, the first must be the string to use as a message, the
+second a hashref or arrayref. In this case, a key called message should not be
+set.
+
+Finally, C<send> can also be called with an array of key => values, one of which
+must be message.
+
+Keys will be uppercased.
+
+=head2 C<perror($msg)>
+
+Logs the string of the current set C<errno>, prefixed with C<$msg>.
+
 =head1 SEE ALSO
 
-=for :list
-* L<Log::Journald>
+=over 4
+
+=item *
+
+L<Log::Journald>
+
 At some point between me writing this module and getting around to releasing it,
 another module was released to write the journal.
-* L<systemd|http://www.freedesktop.org/wiki/Software/systemd/>
+
+=item *
+
+L<systemd|http://www.freedesktop.org/wiki/Software/systemd/>
+
 The main C<systemd> page.
-* L<sd-journal(3)>
+
+=item *
+
+L<sd-journal(3)>
+
 Man page of the C API
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://github.com/ioanrogers/Linux-Systemd/issues>.
+
+=head1 AVAILABILITY
+
+The project homepage is L<http://metacpan.org/release/Linux-Systemd-Journal/>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/Linux::Systemd/>.
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/ioanrogers/Linux-Systemd>
+and may be cloned from L<git://github.com/ioanrogers/Linux-Systemd.git>
+
+=head1 AUTHOR
+
+Ioan Rogers <ioanr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Ioan Rogers.
+
+This is free software, licensed under:
+
+  The GNU Lesser General Public License, Version 2.1, February 1999
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME
+THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.
+
+=cut
