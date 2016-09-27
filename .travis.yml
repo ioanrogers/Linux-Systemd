@@ -5,7 +5,6 @@ addons:
     packages:
       - aspell
       - aspell-en
-      - libsystemd-dev
 language: perl
 perl:
   - blead
@@ -34,4 +33,11 @@ env:
     - NO_EDIT_CHANGES=1
     - RELEASE_TESTING=1
 before_install:
+  - wget https://github.com/systemd/systemd/archive/v231.tar.gz
+  - tar xvzf v231.tar.gz
+  - sudo add-apt-repository -y ppa:pitti/systemd-semaphore
+  - sudo apt-get update -q
+  - sudo apt-get build-dep systemd -y
+  - sudo apt-get -y install libmount-dev
+  - pushd systemd-231; ./autogen.sh && ./configure --enable-address-sanitizer --enable-split-usr --disable-dbus --disable-utmp --disable-kmod --disable-xkbcommon --disable-blkid --disable-seccomp --disable-ima --disable-selinux --disable-apparmor --disable-xz --disable-lz4 --disable-pam --disable-acl --disable-smack --disable-gcrypt --disable-audit --disable-elfutils --disable-libcryptsetup --disable-qrencode --disable-gnutls --disable-microhttpd --disable-libcurl --disable-libidn --disable-libiptc --disable-binfmt --disable-vconsole --disable-quotacheck --disable-tmpfiles --disable-sysusers --disable-firstboot --disable-randomseed --disable-backlight --disable-rfkill --disable-logind --disable-machined --disable-importd --disable-localed --disable-coredump --disable-polkit --disable-resolved --disable-networkd --disable-efi --disable-myhostname --disable-hwdb --disable-manpages --disable-hibernate --enable-split-usr --disable-tests --without-python --disable-nls && make -j$(nproc)
   - eval $(curl https://travis-perl.github.io/init) --auto --always-upgrade-modules --debug
