@@ -1,3 +1,7 @@
 TYPEMAP
-sd_journal * T_PTR
-uint64_t    T_IV
+sd_journal     * T_PTR
+sd_bus         * T_PTR
+sd_bus_message * T_PTR
+
+uint64_t         T_IV
+AV             * T_AVREF_REFCOUNT_FIXED
