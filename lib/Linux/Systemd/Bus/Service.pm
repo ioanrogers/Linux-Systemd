@@ -14,18 +14,16 @@ has _bus => (
 );
 
 has name => (
-    is => 'ro',
+    is       => 'ro',
     required => 1,
 );
 
 has path => (
-    is => 'ro',
+    is       => 'ro',
     required => 1,
 );
 
-has _definition => (
-    is       => 'lazy',
-);
+has _definition => (is => 'lazy',);
 
 sub _build__definition {
     my $self = shift;
@@ -55,7 +53,7 @@ sub _get_methods {
 
 sub _get_properties {
     my $interface_node = shift;
-    my $p = {};
+    my $p              = {};
     for my $node ($interface_node->findnodes('property')) {
 
         my $name = $node->getAttribute('name');
@@ -65,7 +63,8 @@ sub _get_properties {
         };
 
         for my $annotation_node ($node->findnodes('annotation')) {
-            $p->{$name}->{annotations}->{$annotation_node->getAttribute('name')} =
+            $p->{$name}->{annotations}
+              ->{$annotation_node->getAttribute('name')} =
               $annotation_node->getAttribute('value');
 
         }
@@ -76,15 +75,13 @@ sub _get_properties {
 
 sub _get_signals {
     my $interface_node = shift;
-    my $s = {};
+    my $s              = {};
     for my $node ($interface_node->findnodes('signal')) {
         my $name = $node->getAttribute('name');
         $s->{$name} = [];
 
         for my $arg_node ($node->findnodes('arg')) {
-            my $arg = {
-                type      => $arg_node->getAttribute('type'),
-            };
+            my $arg = {type => $arg_node->getAttribute('type'),};
 
             $arg->{name} = $arg_node->getAttribute('name')
               if $arg_node->getAttribute('name');
@@ -101,7 +98,7 @@ sub introspect {
 
     my $dom = XML::LibXML->load_xml(
         load_ext_dtd => 0,
-        string       => Linux::Systemd::Bus::_introspect($self->name, $self->path));
+        string => Linux::Systemd::Bus::_introspect($self->name, $self->path));
 
     my $interface;
     for my $interface_node ($dom->findnodes('/node/interface')) {
@@ -122,7 +119,7 @@ sub introspect {
 
 sub interfaces {
     my $self = shift;
-    return [ sort keys %{$self->_definition} ];
+    return [sort keys %{$self->_definition}];
 }
 
 sub get_interface {
@@ -132,11 +129,10 @@ sub get_interface {
 
     require Linux::Systemd::Bus::Interface;
 
-
     return Linux::Systemd::Bus::Interface->new(
-        _service => $self,
+        _service    => $self,
         _definition => $self->_definition->{$interface},
-        name => $interface,
+        name        => $interface,
     );
 
 }

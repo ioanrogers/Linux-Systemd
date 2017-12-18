@@ -14,18 +14,30 @@ has _service => (
 );
 
 has name => (
-    is => 'ro',
+    is       => 'ro',
     required => 1,
 );
 
-has method => (
-    is => 'ro',
-);
+has method => (is => 'ro',);
 
 has _definition => (
     is       => 'ro',
     required => 1,
     weak_ref => 1,
 );
+
+sub call {
+    my ($self, $method, @args) = @_;
+    use DDP;
+    p @args;
+    return $self->_service->_bus->call($self->_service, $self, $method);
+}
+
+sub get {
+    my $self = shift;
+
+    return $self->_service->_bus->get_property($self->_service->name,
+        $self->_service->path, $self->name, $_[0],);
+}
 
 1;
