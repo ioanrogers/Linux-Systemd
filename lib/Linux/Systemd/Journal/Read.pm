@@ -1,4 +1,4 @@
-package Linux::Systemd::Journal::Read;
+package Linux::Systemd::Journal::Read 1.191790;
 
 # ABSTRACT: Read from systemd journals
 
@@ -14,41 +14,6 @@ sub BUILD {
     return __open();
 }
 
-=method c<get_usage>
-
-Returns the number of bytes used by the open journal
-
-=method C<seek_head>
-
-Seeks to the start of the open journal.
-
-=method C<seek_tail>
-
-Seeks to the end of the open journal.
-
-=method C<next>
-
-Moves to the next record.
-
-=method C<get_data($field)>
-
-Returns the value of C<$field> from the current record.
-
-See L<systemd.journal-fields(7)> for a list of well-known fields.
-
-=method C<get_entry>
-
-Returns a hashref of all the fields in the current entry.
-
-This method is not a direct wrap of the journal API.
-
-=method C<get_next_entry>
-
-Convenience wrapper which calls L</next> before L</get_entry>
-
-This method is not a direct wrap of the journal API.
-
-=cut
 
 sub get_next_entry {
     my $self = shift;
@@ -100,20 +65,12 @@ sub _match {
     }
 }
 
-=method C<match(field => value)>
-
-
-=cut
 
 sub match {
     my $self = shift;
     return $self->_match(@_);
 }
 
-=method C<match_and(field => value)>
-
-
-=cut
 
 sub match_and {
     my $self = shift;
@@ -121,10 +78,6 @@ sub match_and {
     return $self->_match(@_);
 }
 
-=method C<match_or(field => value)>
-
-
-=cut
 
 sub match_or {
     my $self = shift;
@@ -132,10 +85,81 @@ sub match_or {
     return $self->_match(@_);
 }
 
-=method C<flush_matches>
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=for :stopwords Ioan Rogers
+
+=head1 NAME
+
+Linux::Systemd::Journal::Read - Read from systemd journals
+
+=head1 VERSION
+
+version 1.191790
+
+=head1 METHODS
+
+=head2 c<get_usage>
+
+Returns the number of bytes used by the open journal
+
+=head2 C<seek_head>
+
+Seeks to the start of the open journal.
+
+=head2 C<seek_tail>
+
+Seeks to the end of the open journal.
+
+=head2 C<next>
+
+Moves to the next record.
+
+=head2 C<get_data($field)>
+
+Returns the value of C<$field> from the current record.
+
+See L<systemd.journal-fields(7)> for a list of well-known fields.
+
+=head2 C<get_entry>
+
+Returns a hashref of all the fields in the current entry.
+
+This method is not a direct wrap of the journal API.
+
+=head2 C<get_next_entry>
+
+Convenience wrapper which calls L</next> before L</get_entry>
+
+This method is not a direct wrap of the journal API.
+
+=head2 C<match(field => value)>
+
+=head2 C<match_and(field => value)>
+
+=head2 C<match_or(field => value)>
+
+=head2 C<flush_matches>
 
 Clears the match filters.
 
-=cut
+=head1 AUTHOR
 
-1;
+Ioan Rogers <ioanr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Ioan Rogers.
+
+This is free software, licensed under:
+
+  The GNU Lesser General Public License, Version 2.1, February 1999
+
+=cut
