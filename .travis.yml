@@ -1,4 +1,5 @@
 ---
+dist: bionic
 addons:
   apt:
     packages:
