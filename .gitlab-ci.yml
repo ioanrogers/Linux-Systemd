@@ -1,0 +1,50 @@
+stages:
+  - test
+  - build
+
+image: registry.gitlab.com/ioanrogers/perl-builder:latest
+
+variables:
+  PERL_CPANM_OPT: -L local --no-man-pages --notest
+  PERL_CPM_OPT: --without-test --resolver metacpan -v
+  PERL5LIB: $CI_PROJECT_DIR/local/lib/perl5
+
+cache:
+  paths:
+    - local
+
+before_script:
+  - apt-get update -yqq
+  - apt-get install -yqq libsystemd-dev
+  - dzil authordeps | cpm install $PERL_CPM_OPT -
+  - dzil listdeps --omit-core $(perl -e 'print $]') | cpm install $PERL_CPM_OPT -
+
+test:unit:
+  stage: test
+  variables:
+    PERL_TEST_HARNESS_DUMP_TAP: $CI_PROJECT_DIR/test-output
+    HARNESS_TIMER: 1
+    HARNESS_OPTIONS: fTAP-Formatter-JUnit
+  script:
+    - dzil test
+  artifacts:
+    reports:
+      junit:
+        - $CI_PROJECT_DIR/test-output/t/*.junit.xml
+        - $CI_PROJECT_DIR/test-output/t/journal/*.junit.xml
+
+test:coverage:
+  stage: test
+  script:
+    - dzil cover -test -report kritika
+  coverage: /Total\s+.+\s(\d+\.\d+?)$/
+
+build:
+  stage: build
+  variables:
+    DZSIGN: 0
+  script:
+    - dzil build
+  artifacts:
+    paths:
+      - Linux-Systemd-*.tar.gz
