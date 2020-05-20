@@ -5,7 +5,6 @@ stages:
 image: registry.gitlab.com/ioanrogers/perl-builder:latest
 
 variables:
-  PERL_CPANM_OPT: -L local --no-man-pages --notest
   PERL_CPM_OPT: --without-test --resolver metacpan -v --show-build-log-on-failure
   PERL5LIB: $CI_PROJECT_DIR/local/lib/perl5
 
