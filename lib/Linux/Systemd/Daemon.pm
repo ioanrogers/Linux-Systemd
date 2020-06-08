@@ -1,4 +1,4 @@
-package Linux::Systemd::Daemon;
+package Linux::Systemd::Daemon 1.201600;
 
 # ABSTRACT: Systemd daemon API
 
@@ -16,17 +16,6 @@ our %EXPORT_TAGS =
 
 XSLoader::load;
 
-=func C<sd_notify(@array_of_pairs)>
-
-The main function, exported by default. Takes a list of pairs and converts them
-to a string to be passed to the C function
-L<man:sd_notify(3)|https://www.freedesktop.org/software/systemd/man/sd_notify.html>
-
-e.g.
-
-  sd_notify(ready => 1, status => 'Processing requests');
-
-=cut
 
 # TODO optimise by pushing this into the XS
 # *sd_notify = \&Linux::Systemd::Daemon::notify;
@@ -39,51 +28,26 @@ sub sd_notify {
     return notify($str);
 }
 
-=func C<sd_watchdog()>
-
-Convenience function. Optional export.
-
-=cut
 
 sub sd_watchdog {
     return notify('WATCHDOG=1');
 }
 
-=func C<sd_ready()>
-
-Convenience function. Optional export.
-
-=cut
 
 sub sd_ready {
     return notify('READY=1');
 }
 
-=func C<sd_stopping()>
-
-Convenience function. Optional export.
-
-=cut
 
 sub sd_stopping {
     return notify('STOPPING=1');
 }
 
-=func C<sd_reloading()>
-
-Convenience function. Optional export.
-
-=cut
 
 sub sd_reloading {
     return notify('RELOADING=1');
 }
 
-=func C<sd_status(Str $status_message)>
-
-Convenience function. Optional export.
-
-=cut
 
 sub sd_status {
     my $status = shift;
@@ -91,6 +55,22 @@ sub sd_status {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=for :stopwords Ioan Rogers
+
+=head1 NAME
+
+Linux::Systemd::Daemon - Systemd daemon API
+
+=head1 VERSION
+
+version 1.201600
 
 =head1 SYNOPSIS
 
@@ -118,6 +98,52 @@ tag.
 For a fully featured example, see the C<perl-daemon> script and
 C<perl-daemon.service> examples in C<eg>.
 
+=head1 FUNCTIONS
+
+=head2 C<sd_notify(@array_of_pairs)>
+
+The main function, exported by default. Takes a list of pairs and converts them
+to a string to be passed to the C function
+L<man:sd_notify(3)|https://www.freedesktop.org/software/systemd/man/sd_notify.html>
+
+e.g.
+
+  sd_notify(ready => 1, status => 'Processing requests');
+
+=head2 C<sd_watchdog()>
+
+Convenience function. Optional export.
+
+=head2 C<sd_ready()>
+
+Convenience function. Optional export.
+
+=head2 C<sd_stopping()>
+
+Convenience function. Optional export.
+
+=head2 C<sd_reloading()>
+
+Convenience function. Optional export.
+
+=head2 C<sd_status(Str $status_message)>
+
+Convenience function. Optional export.
+
 =head1 SEE ALSO
 
 https://www.freedesktop.org/software/systemd/man/sd-daemon.html
+
+=head1 AUTHOR
+
+Ioan Rogers <ioanr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Ioan Rogers.
+
+This is free software, licensed under:
+
+  The GNU Lesser General Public License, Version 2.1, February 1999
+
+=cut

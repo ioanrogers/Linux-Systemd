@@ -1,8 +1,0 @@
-*.c
-*.o
-*~
-.build
-Linux-*
-_build
-blib
-local
