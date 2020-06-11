@@ -2,10 +2,8 @@ package Linux::Systemd::Bus;
 
 # ABSTRACT: Systemd Bus API
 
-use v5.16;
+use v5.22;
 use strictures 2;
-use Linux::Systemd::Bus::Service;
-# use XML::LibXML;
 use XSLoader;
 use Moo;
 use namespace::clean;
@@ -20,18 +18,6 @@ sub BUILD {
 
 sub list {
     return _list();
-}
-
-sub get_service {
-    my ($self, $service_name, $path) = @_;
-
-    my $service = Linux::Systemd::Bus::Service->new(
-        _bus => $self,
-        name => $service_name,
-        path => $path,
-    );
-
-    return $service;
 }
 
 sub get_property {
