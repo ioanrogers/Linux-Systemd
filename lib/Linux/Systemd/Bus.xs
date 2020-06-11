@@ -82,20 +82,25 @@ SV *parse_struct(sd_bus_message *m) {
     AV *struct_av = newAV();
 
     printf("Parsing struct\n");
-    if (sd_bus_message_enter_container(m, type, NULL) < 0)
+    r = sd_bus_message_enter_container(m, type, NULL);
+    printf("ENTER STRUCT: %d - %s\n", r, strerror(-r));
+
+    if (r == 0) {
+      printf("No more structs\n");
+      return NULL;
+    } else if ( r < 0) {
         croak("Failed to enter struct container");
+    }
 
     for (;;) {
         const char *contents = NULL;
         char type;
 
         r = sd_bus_message_peek_type(m, &type, &contents);
-        if (r < 0)
+
+        if (r < 0) {
             croak("Failed to peek type");
-
-        printf("[STRUCT] %c\n", type);
-
-        if (r == 0) {
+        } else if (r == 0) {
             printf("Finished struct\n");
             if (sd_bus_message_exit_container(m) < 0)
                 croak("Failed to exit container");
@@ -103,46 +108,60 @@ SV *parse_struct(sd_bus_message *m) {
             break;
         }
 
-        av_push(struct_av, message_to_sv(m, type));
+        printf("[STRUCT] %c\n", type);
 
+        av_push(struct_av, message_to_sv(m, type));
     }
 
     return newRV_noinc((SV*) struct_av);
 }
 
-AV *parse_message(sd_bus_message *m) {
-    int r;
-    AV *array_av = newAV();
+AV *parse_array(sd_bus_message *message) {
+  AV *array_av = newAV();
+  char type;
+  const char *contents;
+  int r;
 
-    if (sd_bus_message_enter_container(m, 'a', NULL) < 0)
-        croak("Failed to enter array container");
+  r = sd_bus_message_peek_type(message, &type, &contents);
+  if (r < 0)
+      croak("Failed to peek type");
 
-    for (;;) {
-        const char *contents = NULL;
-        char type;
+  if (type != SD_BUS_TYPE_ARRAY)
+      croak("Expected an array, got a: %c\n", type);
 
-        r = sd_bus_message_peek_type(m, &type, &contents);
-        if (r < 0)
-            croak("Failed to peek type");
+  printf("Got %c[%s]\n", type, contents);
 
-        printf(">> %c = %s\n", type, contents);
+  r = sd_bus_message_enter_container(message, SD_BUS_TYPE_ARRAY, contents);
+  if (r < 0)
+      croak("enter container fail: %s\n", strerror(-r));
 
-        if (r == 0) {
-            printf("EXIT\n");
-            if (sd_bus_message_exit_container(m) < 0)
-                croak("Failed to exit container");
-            break;
-        }
+  if (strncmp(contents, "s", 1) == 0) {
+      printf("Gettings strings\n");
+      const char *str;
 
-        if (type == SD_BUS_TYPE_STRUCT) {
-            av_push(array_av, parse_struct(m));
-            continue;
-        }
+      while ((r = sd_bus_message_read_basic(message, SD_BUS_TYPE_STRING, &str)) > 0) {
+          printf("s: %s\n", str);
+          av_push(array_av, newSVpv(str, strlen(str)));
+      }
 
-        // av_push(array_av, message_to_sv(m, type));
+  } else if (strncmp(contents, "(", 1) == 0) {
+      const char *struct_contents = NULL;
+      char struct_type;
+      AV *struct_av = newAV();
 
-    }
-    return array_av;
+      printf("Getting structs\n");
+
+      while (struct_av = parse_struct(message)) {
+          av_push(array_av, struct_av);
+      }
+
+  }
+
+  r = sd_bus_message_exit_container(message);
+  if (r < 0)
+    croak("exit container fail: %s\n", strerror(-r));
+
+  return array_av;
 }
 
 MODULE = Linux::Systemd::Bus	PACKAGE = Linux::Systemd::Bus
@@ -259,9 +278,8 @@ _call_method_returning_array(char *service, char *path, char *interface, char *m
     PREINIT:
         sd_bus_message *reply = NULL;
         sd_bus_error error = SD_BUS_ERROR_NULL;
-        char *i = NULL;
-        const char *id, *user, *seat, *object;
-        uint32_t uid;
+        const char *contents;
+        char type;
 
     CODE:
         int r = sd_bus_call_method(
@@ -278,8 +296,7 @@ _call_method_returning_array(char *service, char *path, char *interface, char *m
         if (r < 0)
             croak("Failed to call method: %s\n", strerror(-r));
 
-        RETVAL = parse_message(reply);
-
+        RETVAL = parse_array(reply);
 
         // r = sd_bus_message_enter_container(reply, 'a', "(susso)");
         // if (r < 0)

@@ -5,7 +5,7 @@ package Linux::Systemd::Bus;
 use v5.16;
 use strictures 2;
 use Linux::Systemd::Bus::Service;
-use XML::LibXML;
+# use XML::LibXML;
 use XSLoader;
 use Moo;
 use namespace::clean;
