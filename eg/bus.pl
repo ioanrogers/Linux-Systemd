@@ -8,7 +8,7 @@ use Linux::Systemd::Bus;
 my $bus = Linux::Systemd::Bus->new;
 
 # list all names on the bus
-for my $name (@{$bus->list}) {
+for my $name (@{$bus->list_names}) {
     say $name;
 }
 

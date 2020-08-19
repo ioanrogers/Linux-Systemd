@@ -15,11 +15,6 @@ sub BUILD {
 
     return;
 }
-
-sub list {
-    return _list();
-}
-
 sub get_property {
     my ($self, $service_name, $path, $interface, $property) = @_;
     return _get_property_string($service_name, $path, $interface, $property);
