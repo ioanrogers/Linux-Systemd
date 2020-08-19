@@ -173,8 +173,14 @@ _get_system_bus()
     CODE:
         int r = sd_bus_default_system(&bus);
         if (r < 0)
-            croak("Failed to get bus: %s\n", strerror(-r));
+            croak("Failed to get system bus: %s\n", strerror(-r));
 
+NO_OUTPUT void
+_get_session_bus()
+    CODE:
+        int r = sd_bus_default_user(&bus);
+        if (r < 0)
+            croak("Failed to get session bus: %s\n", strerror(-r));
 
 NO_OUTPUT void
 DESTROY(self)

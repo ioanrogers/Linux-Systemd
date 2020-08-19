@@ -3,9 +3,9 @@
 use v5.22;
 use warnings;
 use Data::Printer;
-use Linux::Systemd::Bus;
+use Linux::Systemd::Bus::System;
 
-my $bus = Linux::Systemd::Bus->new;
+my $bus = Linux::Systemd::Bus::System->new;
 
 # list all names on the bus
 for my $name (@{$bus->list_names}) {
