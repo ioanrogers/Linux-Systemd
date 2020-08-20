@@ -331,32 +331,52 @@ _call_method_returning_void(char *service, char *path, char *interface, char *me
         if (r < 0)
             croak("Failed to call method: %s\n", strerror(-r));
 
-
 SV *
 _get_property_string(char *service, char *path, char *interface, char *property)
     PREINIT:
         sd_bus_message *reply = NULL;
         sd_bus_error error = SD_BUS_ERROR_NULL;
-        const char *s;
+        const char *value;
     CODE:
-        int r = sd_bus_get_property(
+        int r = sd_bus_get_property_string(
             bus,
             service,
             path,
             interface,
             property,
             &error,
-            &reply,
-            "s"
+            &value
         );
 
         if (r < 0)
             croak("Failed to get property: %s\n", strerror(-r));
 
-        r = sd_bus_message_read(reply, "s", &s);
-        if (r < 0)
-            croak("Failed to parse message: %s\n", strerror(-r));
+        RETVAL = newSVpv(value, strlen(value));
+        free(value);
 
-        RETVAL = newSVpv(s, strlen(s));
+    OUTPUT: RETVAL
+
+SV *
+_get_property_int64(char *service, char *path, char *interface, char *property)
+    PREINIT:
+        sd_bus_message *reply = NULL;
+        sd_bus_error error = SD_BUS_ERROR_NULL;
+        int64_t *value;
+    CODE:
+        int r = sd_bus_get_property_trivial(
+            bus,
+            service,
+            path,
+            interface,
+            property,
+            &error,
+            'x',
+            &value
+        );
+
+        if (r < 0)
+            croak("Failed to get int64 property: %s\n", strerror(-r));
+
+        RETVAL = newSViv(PTR2IV(value));
 
     OUTPUT: RETVAL

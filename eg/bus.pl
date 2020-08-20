@@ -14,15 +14,18 @@ for my $name (@{$bus->list_names}) {
 
 # get the system hostname
 my $hostname = $bus->get_property(
-    'org.freedesktop.hostname1', '/org/freedesktop/hostname1',
-    'org.freedesktop.hostname1', 'Hostname'
+    'string',                     'org.freedesktop.hostname1',
+    '/org/freedesktop/hostname1', 'org.freedesktop.hostname1',
+    'Hostname'
 );
 say "Hostname: $hostname";
 
 # find the host's bluetooth address
-my $address =
-  $bus->get_property('org.bluez', '/org/bluez/hci0', 'org.bluez.Adapter1',
-    'Address');
+my $address = $bus->get_property(
+    'string',          'org.bluez',
+    '/org/bluez/hci0', 'org.bluez.Adapter1',
+    'Address'
+);
 say "Bluetooth Adapter: $address";
 
 # get the unique machine id
